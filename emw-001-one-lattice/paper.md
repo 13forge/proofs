@@ -1,7 +1,8 @@
 # One Lattice, Three Addresses
 ### State unranking in Sanskrit prosody and zero-allocation integer systems
 
-**Sean (Deveraux)** · 2748684 Alberta Ltd · deveraux.dev
+**Sean Morin (Deveraux)** · 2748684 Alberta Ltd · deveraux.dev
+**DOI:** [10.5281/zenodo.23334659](https://doi.org/10.5281/zenodo.23334659) · **Code:** [github.com/13forge/proofs](https://github.com/13forge/proofs)
 **Series:** East Meets West, EMW-001 · **Status:** DRAFT v0.4, release candidate (2026-10-13). History: v0.1–v0.3, 2026-10-12/13.
 **Licence:** text CC BY 4.0 · code MIT OR Apache-2.0
 
@@ -208,7 +209,7 @@ Piṅgala, Shao Yong, Leibniz and Shannon arrived at binary enumeration independ
 2. [VERIFY] Publisher imprint of Kāvyamālā 91.
 3. [VERIFY] Weber's date: Shah gives 1835 in prose and 1863 in the reference list.
 4. ~~The §8 row 1 bench harness lives outside this repository.~~ Resolved: a self-contained copy is [`prastara/examples/byte_pair_distance_bench.rs`](prastara/examples/byte_pair_distance_bench.rs); the Appendix A numbers are from that copy.
-5. Zenodo deposit and DOI.
+5. DOI reserved (10.5281/zenodo.23334659); publish the Zenodo record together with the release tag.
 
 ---
 

@@ -1,0 +1,449 @@
+% EMW-001 — One Lattice, Three Addresses
+% Build: xelatex emw-001 (twice)   |   latexmk -xelatex emw-001
+% Text CC BY 4.0. Source of truth for content: emw-001-one-lattice/paper.md (v0.4).
+\documentclass[11pt,letterpaper]{article}
+
+% ---------- fonts (XeLaTeX) ----------
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[sc]{mathpazo}            % Palatino math to match Pagella text
+\usepackage[no-math]{fontspec}
+\setmainfont{texgyrepagella}[
+  Extension=.otf, UprightFont=*-regular, BoldFont=*-bold,
+  ItalicFont=*-italic, BoldItalicFont=*-bolditalic, Ligatures=TeX]
+\setsansfont{texgyreheros}[
+  Extension=.otf, UprightFont=*-regular, BoldFont=*-bold,
+  ItalicFont=*-italic, BoldItalicFont=*-bolditalic, Scale=MatchLowercase]
+\setmonofont{DejaVu Sans Mono}[Scale=0.82]
+
+% ---------- layout ----------
+\usepackage[margin=1in]{geometry}
+\usepackage{microtype}
+\usepackage{xcolor}
+\usepackage{array,booktabs,tabularx,longtable}
+\usepackage{enumitem}
+\usepackage{caption}
+\usepackage{fancyhdr}
+\usepackage[hidelinks]{hyperref}
+\usepackage{titlesec}
+
+\definecolor{accent}{HTML}{8A3B12}
+\definecolor{tagproven}{HTML}{1F6B3A}
+\definecolor{tagbuilt}{HTML}{1F4E8A}
+\definecolor{tagdesign}{HTML}{7A5A00}
+\definecolor{tagverify}{HTML}{9B1C1C}
+
+\hypersetup{colorlinks=true,linkcolor=accent,urlcolor=accent,citecolor=accent,
+  pdftitle={One Lattice, Three Addresses: State Unranking in Sanskrit Prosody and Zero-Allocation Integer Systems},
+  pdfauthor={Sean Morin},
+  pdfkeywords={Sanskrit prosody, Pingala, Virahanka, prastara, suci-prastara, ranking and unranking, enumerative coding, combinatorial number system, prefix sum, balanced ternary, run-length-limited codes, deterministic computing}}
+
+\titleformat{\section}{\large\bfseries\sffamily}{\thesection}{0.8em}{}
+\titleformat{\subsection}{\normalsize\bfseries\sffamily}{\thesubsection}{0.8em}{}
+\setlist{itemsep=2pt,topsep=4pt}
+\captionsetup{font=small,labelfont=bf}
+\renewcommand{\arraystretch}{1.18}
+\setlength{\emergencystretch}{3em}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\sffamily EMW-001 \textperiodcentered{} One Lattice, Three Addresses}
+\fancyhead[R]{\small\sffamily v0.4 (release candidate)}
+\fancyfoot[C]{\small\thepage}
+\renewcommand{\headrulewidth}{0.3pt}
+
+% ---------- tags & environments ----------
+\newcommand{\tagbox}[2]{\textsf{\textbf{\color{#1}#2}}}
+\newcommand{\PROVEN}{\tagbox{tagproven}{PROVEN}}
+\newcommand{\BUILT}{\tagbox{tagbuilt}{BUILT}}
+\newcommand{\DESIGN}{\tagbox{tagdesign}{DESIGN\_TARGET}}
+\newcommand{\VERIFY}{\tagbox{tagverify}{[VERIFY]}}
+\newcommand{\skt}[1]{\textit{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+\DeclareMathOperator{\pext}{pext}
+\DeclareMathOperator{\pdep}{pdep}
+\DeclareMathOperator{\crank}{crank}
+\DeclareMathOperator{\cunrank}{cunrank}
+
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}
+\theoremstyle{remark}
+\newtheorem*{remark}{Remark}
+
+\begin{document}
+
+% ---------- title block ----------
+\thispagestyle{empty}
+\begin{center}
+{\sffamily\small\color{accent} EAST MEETS WEST \textperiodcentered{} EMW-001}\\[10pt]
+{\LARGE\bfseries One Lattice, Three Addresses}\\[6pt]
+{\large State Unranking in Sanskrit Prosody and Zero-Allocation Integer Systems}\\[16pt]
+{\large Sean Morin \textup{(Deveraux)}}\\[3pt]
+{\small 2748684 Alberta Ltd., Edmonton, Alberta \textperiodcentered{} \href{https://deveraux.dev}{deveraux.dev}}\\[10pt]
+{\small DOI \href{https://doi.org/10.5281/zenodo.23334659}{10.5281/zenodo.23334659}
+ \textperiodcentered{} Code \href{https://github.com/13forge/proofs}{github.com/13forge/proofs}}\\[3pt]
+{\small Draft v0.4, release candidate \textperiodcentered{} 13 October 2026}
+\end{center}
+
+\vspace{6pt}
+\begin{abstract}
+\noindent Sanskrit prosody needed to catalogue every possible metre. Over about fifteen centuries it produced three exact, table-free ways to go between an integer index and a metre: positional (binary), weight-constrained (binomial), and duration-constrained (Fibonacci). Modern enumerative combinatorics calls these \emph{ranking} and \emph{unranking}. This paper states the three schemes precisely, proves them, and checks them exhaustively by machine. It extends the weight-constrained scheme to balanced-ternary vectors with exactly $r$ non-zero digits, and shows that the binomials every scheme needs can be built by Virahāṅka's \skt{sūci-prastāra} as add-only prefix scans, which removes division from the whole path. It corrects several inflations of the historical record, including three errors in our own earlier drafts. It maps each scheme onto state addressing in a deterministic integer runtime, with measured bounds on where a table-free address actually pays. We do not claim descent from these texts to modern computing. The claim is narrower: anyone who must enumerate a discrete space under a hard constraint ends up on the same lattice, and the prosodists reached it from a linguistic constraint.
+
+\medskip\noindent\textbf{Keywords:} Sanskrit prosody; Piṅgala; Virahāṅka; \skt{prastāra}; \skt{sūci-prastāra}; ranking and unranking; enumerative coding; combinatorial number system; prefix sum; balanced ternary; run-length-limited codes; deterministic computing.
+\end{abstract}
+
+\vspace{4pt}
+\begin{center}\small
+\begin{tabular}{@{}ll@{}}
+\toprule
+\textbf{Tag} & \textbf{Meaning}\\
+\midrule
+\PROVEN & Statement with proof given here, plus exhaustive machine check (Appendix~\ref{app:receipts})\\
+\BUILT & Running code exists with receipts\\
+\DESIGN & Intended integration, not yet built\\
+\VERIFY & Historical claim that needs a primary or peer-reviewed source before release\\
+\bottomrule
+\end{tabular}\\[4pt]
+\parbox{0.86\linewidth}{\footnotesize Statements headed \emph{Remark} are standard results given for orientation; they carry no tag and are not part of the machine check.}
+\end{center}
+
+\vfill
+{\footnotesize\noindent Text licensed CC BY 4.0. Code MIT OR Apache-2.0.\par}
+\newpage
+
+% =====================================================================
+\section{Scope and non-claims}\label{sec:scope}
+
+\begin{enumerate}[label=\arabic*.]
+\item \textbf{No lineage.} Modern computing descends from Leibniz $\to$ Boole $\to$ Shannon. Indian prosody is independent discovery, not ancestry.
+\item \textbf{No hardware.} These are methods for enumerating and counting. There is no logic-gate design and no Boolean algebra.
+\item \textbf{No ``father of computing.''} That framing is rejected.
+\item \textbf{No priority on the bridge.} We know of no prior work that frames \skt{sūci-prastāra} as a scan primitive. Absence of evidence is not proof of absence, so we make no ``first'' claim.
+\item \textbf{No new mathematics.} Every theorem here is a known result or a direct composition of known results (Lehmer, Cover, Schalkwijk, Knuth). What is new is the reading: the correspondence, the corrections, and the receipts.
+\item \textbf{What is claimed:} the same addressing structures appear in a premodern linguistic tradition, in exact algorithmic form, and they transfer without modification to a zero-allocation integer system.
+\end{enumerate}
+
+% =====================================================================
+\section{Chronology (corrected)}\label{sec:chron}
+
+{\small
+\begin{longtable}{@{}p{0.12\linewidth}p{0.21\linewidth}p{0.40\linewidth}p{0.17\linewidth}@{}}
+\toprule
+\textbf{Date} & \textbf{Source} & \textbf{Contribution} & \textbf{Basis}\\
+\midrule\endhead
+\bottomrule\endfoot
+c.\ 3rd--2nd c.\ BCE & Piṅgala, \skt{Chandaḥśāstra} 8.20--8.35 & Terse sūtras: \skt{prastāra} 8.20--23, \skt{naṣṭa} 8.24--25, \skt{uddiṣṭa} 8.26--27, \skt{saṅkhyā} 8.28--31, \skt{adhvayoga} 8.32--33, ``\skt{pare pūrṇam}'' 8.34--35. The Yajur recension carries an extra \skt{lagakriyā} sūtra (``\skt{ekottarakramaśaḥ pūrvapṛktā lasaṃkhyā}'') absent from Halāyudha's text. & Kedāranātha 1938; Kulkarni 2008; Shah 2008 pp.\ 8, 29\\
+c.\ 1st c.\ CE & Bharata, \skt{Nāṭyaśāstra} & \textbf{\skt{Lagakriyā} by repeated partial sums}, dropping the terminal sum each pass: the earliest firmly attested binomial construction in the Indian record. & Shah 2008 pp.\ 2, 9--10\\
+c.\ 7th c.\ CE & Virahāṅka, \skt{Vṛttajātisamuccaya} 6.7--6.12 & Names and gives \textbf{both} constructions: \textbf{\skt{sūci-prastāra}} (``needle spread'', the partial-sum column method) and \textbf{\skt{meru-prastāra}} (the two-cells-above triangle). Meru first appears here, not in Halāyudha. Also the \skt{mātrā} rule: each count is the sum of the previous two. & Shah 2008 pp.\ 10, 19, 31--32 (tr.\ of Velankar 1962); Singh 1985\\
+c.\ 950 & Halāyudha, \skt{Mṛtasañjīvanī} & First to read sūtra 8.34--35 as an instruction to build the meru. \textbf{Disputed}: Weber and Shah reject it, Alsdorf defends it. The triangle itself is three centuries older. & Shah 2008 pp.\ 2, 8, 29\\
+1011--1077 & Shao Yong & The \skt{xiantian} (``Fuxi'') hexagram arrangement, later read as a binary ordering; whether his own usage was binary is contested. & Maitre 2025\\
+c.\ 1100 & Kedāra Bhaṭṭa, \skt{Vṛttaratnākara} & The ``write 1, 2, 4 over the syllables and add'' form of \skt{uddiṣṭa} usually quoted as Piṅgala's. & Kulkarni 2008 p.\ 14\\
+before 1135 & Gopāla (on Virahāṅka) & Worked values 3, 5, 8, 13, 21. & Singh 1985\\
+c.\ 1150 & Hemacandra & Same recurrence, stated independently. & Singh 1985\\
+1202 & Fibonacci, \skt{Liber Abaci} & Same recurrence, in Europe. & ---\\
+early 14th c. & \skt{Prākṛta Paiṅgala} & \textbf{\skt{Mātrā-meru}}: \skt{mātrā} metres tabulated by guru count; entries are binomial. & Singh 1985\\
+1356 & Nārāyaṇa Paṇḍita, \skt{Gaṇita Kaumudī} & \textbf{\skt{Sūcī-paṅkti}} (``needle sequence''): a separate, product-built construction yielding multinomial generalisations. Not Virahāṅka's \skt{sūci-prastāra}. & Singh 1985\\
+15 Mar 1679 & Leibniz, \skt{De progressione dyadica} (MS) & Binary arithmetic, dated in Leibniz's hand. & Hochstetter \& Greve 1966\\
+4 Nov 1701 & Bouvet $\to$ Leibniz (recv.\ 1 Apr 1703) & Hexagram woodcut, which Leibniz took as \textbf{confirmation}, not origin. Leibniz had sent Bouvet his binary table on 15 Feb 1701. & Leibniz--Bouvet archive\\
+1703 (pr.\ 1705) & Leibniz, \skt{Explication de l'Arithmétique Binaire} & Sent to the Académie within a week of Bouvet's letter arriving. & Leibniz--Bouvet archive\\
+1967 & Ingerman, \skt{CACM} 10(3) & Proposes ``Pāṇini--Backus Form''. & Ingerman 1967\\
+\end{longtable}
+}
+
+\paragraph{Corrections logged against circulating accounts.}
+\begin{itemize}
+\item \emph{``Leibniz got binary from the I Ching.''} False. He had binary in 1679 and received the hexagrams in 1703 (letter dated 1701).
+\item \emph{``Piṅgala wrote Pascal's triangle.''} Disputed. The triangle first appears by name in Virahāṅka (7th c.); Halāyudha (10th c.) is the first to attribute it to Piṅgala's sūtra, and Shah argues the sūtra does not support that. Shah does trace the \emph{computation} of binomials to Piṅgala via the Yajur-recension \skt{lagakriyā} sūtra.
+\item \emph{Sūci-prastāra.} The \textbf{name} is Virahāṅka's (7th c.). The \textbf{construction} is already in Bharata's \skt{Nāṭyaśāstra} (c.\ 1st c.\ CE), which holds the earliest firm attestation. Our v0.1 draft said ``earliest \dots{} earlier than the meru''; both halves were wrong, since Virahāṅka gives sūci and meru side by side. Nārāyaṇa's \skt{sūcī-paṅkti} (1356) is a different object.
+\item \emph{Naṣṭa orientation (our own v0.1 error).} Sūtra 8.24 \skt{l-ardhe}: ``if it halves, L''; 8.25 \skt{sa-eke g}: ``with one added, G''. So an \textbf{even} row index yields L and an \textbf{odd} one yields G, row~1 being all-G. Our draft had the parities swapped. The ``write 1, 2, 4 and add'' form of \skt{uddiṣṭa} is Kedāra Bhaṭṭa's, not Piṅgala's 8.26--27, which doubles from the first laghu and subtracts one at each guru. Corrected in §\ref{sec:enc}--§\ref{sec:pos}.
+\item \emph{``Oldest prefix-sum accumulator in history.''} Unsupported superlative. Removed.
+\item \emph{``Prosodists flattened the triangle to cut working-memory load.''} A plausible motive, but no text says it. Removed.
+\end{itemize}
+
+% =====================================================================
+\section{Encoding}\label{sec:enc}
+
+A metre of $n$ syllables is a word in $\{\mathrm{L},\mathrm{G}\}^n$. Laghu (L, short) $\mapsto 1$, guru (G, long) $\mapsto 0$. Syllable $i$ (0-indexed from the start of the line) is bit $i$, so \textbf{the first syllable is the least significant bit}. This is the convention under which Piṅgala's row $k$ reads as the binary of $k-1$ (Van Nooten 1993; Kulkarni 2008 §2.2.1). In \skt{mātrā} (duration) metres, L weighs 1 and G weighs 2.
+
+The same construction works in any radix $B$: Kulkarni (2008, Table~11) states Piṅgala's \skt{uddiṣṭa} for base $B$ directly. A balanced-ternary lattice (digits $-1,0,+1$ stored as $0,1,2$) is the $B=3$ case, and its pack/unpack is \skt{naṣṭa}/\skt{uddiṣṭa} with 3 in place of 2.
+
+% =====================================================================
+\section{Addressing I: positional (\skt{prastāra}, \skt{naṣṭa}, \skt{uddiṣṭa})}\label{sec:pos}
+
+\paragraph{Prastāra.} The canonical enumeration of $\{\mathrm{L},\mathrm{G}\}^n$ starts at all-G. Each next row flips the first G to L and resets every earlier syllable to G: a binary counter running backwards. Indices are \textbf{1-based}.
+
+\paragraph{Naṣṭa (index $\to$ metre), sūtras 8.24--8.25.} Given row $k$: if $k$ is even (\skt{l-ardhe}), the syllable is L and $k \leftarrow k/2$. If $k$ is odd (\skt{sa-eke g}), the syllable is G and $k \leftarrow (k+1)/2$. Repeat $n$ times.
+
+\paragraph{Uddiṣṭa (metre $\to$ index), sūtras 8.26--8.27.} Piṅgala: start at 1 on the last syllable and work backwards, doubling at each syllable and subtracting one after doubling at each guru. Kedāra Bhaṭṭa's later form is the one usually quoted: write $1,2,4,\dots$ over the syllables, add the values over the \textbf{laghus}, then add~1. Both give the same number.
+
+\begin{theorem}[Positional address \textup{---} \PROVEN]\label{thm:pos}
+Under the encoding of §\ref{sec:enc}, \skt{naṣṭa}$(k) = k-1$, and \skt{uddiṣṭa} is its inverse. The \skt{prastāra} is the bijection $\{1,\dots,2^n\} \leftrightarrow \{0,1\}^n$ given by the little-endian binary of $k-1$.
+\end{theorem}
+\begin{proof}
+Write $k-1 = \sum_i b_i 2^i$. Then $k$ even $\iff b_0 = 1 \iff$ L. Both update rules map $k$ to $1 + \lfloor (k-1)/2 \rfloor$, which shifts $k-1$ right by one bit. By induction on $n$, the $i$-th emitted syllable is $b_i$. Kedāra's \skt{uddiṣṭa} computes $1 + \sum_i b_i 2^i = k$ directly; Piṅgala's backward doubling is Horner's rule on the same digits.
+\end{proof}
+
+\paragraph{Saṅkhyā (count).} $|\{\mathrm{L},\mathrm{G}\}^n| = 2^n$, computed by Piṅgala's rule: for even $n$, halve and square; for odd $n$, subtract one and double. This is exponentiation by squaring, $O(\log n)$, the method modular exponentiation in RSA uses.
+
+\paragraph{Cost.} $O(n)$ shifts and masks, no table, no allocation. The halvings in \skt{naṣṭa} are shifts.
+
+% =====================================================================
+\section{Addressing II: weight-constrained (\skt{lagakriyā}, \skt{sūci}, \skt{meru})}\label{sec:weight}
+
+The number of $n$-syllable metres with exactly $r$ laghus is $\binom{n}{r}$. \skt{Lagakriyā} (``the L-reckoning'') computes these values; the \skt{sūci} and \skt{meru} \skt{prastāra}s tabulate them.
+
+\begin{theorem}[Weight-constrained address \textup{---} \PROVEN]\label{thm:comb}
+The weight-$r$ rows of the \skt{prastāra} are addressable by the \textbf{combinatorial number system}: every $0 \le k < \binom{n}{r}$ has a unique representation $k = \sum_{j=1}^{r} \binom{c_j}{j}$ with $n > c_r > \dots > c_1 \ge 0$, and the laghu positions are $\{c_j\}$. Unranking is greedy: for $j = r$ down to $1$, take the largest $c$ with $\binom{c}{j} \le k$, set laghu $c$, and subtract.
+\end{theorem}
+\begin{proof}
+Standard (Lehmer; Knuth, TAOCP 7.2.1.3). Exhaustively checked for $n \le 20$ (Appendix~\ref{app:receipts}).
+\end{proof}
+
+\paragraph{Cost.} $O(n)$ binomial lookups. In the reference implementation the binomials come from a compile-time table built by the \skt{sūci-prastāra} of §\ref{sec:suci} (add-only; $65 \times 65$ entries, every $\binom{n}{k}$ with $n \le 64$), so the unranking path contains no division. The multiplicative formula, which divides, is kept only as a test oracle for that table.
+
+\subsection{Sūci-prastāra: the binomials as an iterated scan}\label{sec:suci}
+
+Bharata, and after him Virahāṅka under the name \skt{sūci-prastāra}, build the binomial columns by partial sums. Column~1 is $1,2,\dots,n$. Each later column is the running sum of the one before, with the last entry dropped (Shah 2008 pp.\ 9--10, 31--32; Virahāṅka 6.7--6.9: ``one-by-one, add the number above \dots{} successively leave out the last number'').
+
+\begin{theorem}[Hockey-stick $=$ one \skt{sūci} pass \textup{---} \PROVEN]\label{thm:suci}
+$\displaystyle\sum_{i=r}^{n} \binom{i}{r} = \binom{n+1}{r+1}$. Equivalently, applying an inclusive scan $k$ times to the all-ones vector gives $\binom{i+k}{k}$ at index $i$.
+\end{theorem}
+\begin{proof}
+Pascal's rule $\binom{i+1}{r+1} = \binom{i}{r+1} + \binom{i}{r}$ telescopes. Induct on $k$ for the scan form. Checked for $r \le 20$, $n \le 60$ (identity form) and $k \le 16$, $i < 48$ (scan form).
+\end{proof}
+
+\begin{remark}[Matrix form]
+One inclusive scan of a length-$m$ vector is multiplication by the lower-triangular all-ones matrix $L$. So $k$ \skt{sūci} passes are multiplication by $L^k$, and $L^k[i][j] = \binom{i-j+k-1}{k-1}$ for $i \ge j$. The \skt{sūci-prastāra} is a power of a triangular matrix whose entries are binomials, which is how scan is mapped onto matrix units in practice (Dakkak et al.\ 2019). Checked outside the crate for $k \le 8$, $m = 12$; not a \PROVEN{} item.
+\end{remark}
+
+\paragraph{Systems reading.} The claims below are bounded on purpose.
+
+{\small\setlength{\tabcolsep}{4pt}
+\noindent\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.2\linewidth}*{3}{>{\raggedright\arraybackslash}X}@{}}
+\toprule
+\textbf{Property} & \textbf{Sūci (iterated scan)} & \textbf{Meru (row recurrence)} & \textbf{Multiplicative $\binom{n}{k}$}\\
+\midrule
+Ops, column of length $n$, order $k$ & $nk$ adds & $nk$ adds (in-place, right-to-left) & $O(k)$ multiplies \textbf{and divides} per entry\\
+Working state & one accumulator + caller buffer & caller buffer & $O(1)$\\
+Arithmetic & \textbf{add-only} & add-only & needs division\\
+Maps to & standard scan primitive (Blelloch 1990): SIMD, GPU, FPGA accumulator & 2-tap stencil & scalar ALU\\
+\bottomrule
+\end{tabularx}
+}
+
+\begin{enumerate}[label=\arabic*.]
+\item Sūci and meru do the \textbf{same work} with the \textbf{same asymptotics}. A properly written row update is also a sequential single-buffer pass. The claim that meru is ``cache-thrashing'' does not hold up and is not made here.
+\item Sūci's real systems property is that \textbf{each pass is exactly a prefix scan}, the most heavily optimised parallel primitive there is. Binomial tables inherit $O(\log n)$-depth parallel scans and existing hardware scan units with no new kernels.
+\item Sūci is \textbf{add-only and division-free}. In an integer-deterministic runtime, that removes the only division in the binomial path.
+\item Bench, as a \DESIGN: iterated SIMD scan vs in-place row update vs multiplicative formula, for $n \le 4096$ and $k \le 64$. The hypothesis is parity between the first two; the point is the division-free result, not raw speed.
+\end{enumerate}
+
+\subsection{Signed weight: exactly $r$ non-zero digits in $\{-1,0,+1\}^n$}\label{sec:signed}
+
+Split a balanced-ternary vector into its \textbf{support} $s$ (bit $i$ set iff digit $i \ne 0$) and its \textbf{sign pattern} $p \subseteq s$ (bit $i$ set iff digit $i = +1$). Let $r = |s|$.
+
+\begin{theorem}[Signed-weight address \textup{---} \PROVEN]\label{thm:signed}
+For fixed $n$ and $r$, the map
+\[
+\operatorname{rank}(s,p) = \crank(s)\cdot 2^r + \pext(p,s)
+\]
+is a bijection from the vectors with exactly $r$ non-zero digits onto $\bigl[0, \binom{n}{r} 2^r\bigr)$, where $\crank$ is the combinadic rank of Theorem~\ref{thm:comb} and $\pext(p,s)$ packs the bits of $p$ at the positions of $s$ into an $r$-bit integer. The inverse is $s = \cunrank(\lfloor k/2^r \rfloor)$, $p = \pdep(k \bmod 2^r, s)$. The classes $r = 0,\dots,n$ partition the $3^n$ vectors.
+\end{theorem}
+\begin{proof}
+Theorem~\ref{thm:comb} gives the bijection supports $\leftrightarrow \bigl[0,\binom{n}{r}\bigr)$. For a fixed support, $\pext$/$\pdep$ are mutually inverse bijections between sign patterns and $[0, 2^r)$. Composing by the mixed radix $\bigl(\binom{n}{r}, 2^r\bigr)$ gives the result, and $\sum_r \binom{n}{r} 2^r = 3^n$ by the binomial theorem. Exhaustively checked over all $3^{13} = 1\,594\,323$ vectors and at every width $n \le 9$.
+\end{proof}
+
+This is enumerative coding (Cover 1973; the fixed-weight case is Schalkwijk 1972) under the lexicographic order (support, then sign pattern), applied to a ternary constant-weight set. It is a re-derivation, not a new method. The division is again absent: $\lfloor k/2^r \rfloor$ and $k \bmod 2^r$ are a shift and a mask, and the binomials are the §\ref{sec:suci} table. $\pext$/$\pdep$ are the BMI2 instructions on x86-64; the reference implementation uses a portable $O(r)$ loop by default and the instructions only when the build enables them, and checks the two bit-identical. The address fits a \code{u64} for $n \le 40$ ($3^{40} < 2^{64} < 3^{41}$).
+
+% =====================================================================
+\section{Addressing III: duration-constrained (\skt{mātrā})}\label{sec:matra}
+
+Let $M(n)$ be the number of L/G sequences of total duration $n$, with L $=1$ and G $=2$. The first syllable is either L, leaving $n-1$, or G, leaving $n-2$. So $M(n) = M(n-1) + M(n-2)$ with $M(0) = M(1) = 1$, and therefore $\mathbf{M(n) = F_{n+1}}$. This is Virahāṅka's rule.
+
+\begin{theorem}[Mātrā address \textup{---} \PROVEN]\label{thm:matra}
+Order sequences lexicographically with L $<$ G. For a 0-indexed $k$ and remaining duration $n$: if $k < M(n-1)$, emit L and set $n \leftarrow n-1$; otherwise emit G, set $k \leftarrow k - M(n-1)$ and $n \leftarrow n-2$. This is a bijection $\{0,\dots,F_{n+1}-1\} \leftrightarrow$ sequences of duration $n$, and the corresponding ranking is its inverse.
+\end{theorem}
+\begin{proof}
+Exactly $M(n-1)$ sequences begin with L, and every one of them precedes every sequence beginning with G. Induct on $n$. Checked against brute-force lexicographic enumeration for $n \le 20$.
+\end{proof}
+
+\begin{theorem}[Bridge identity: shallow diagonals \textup{---} \PROVEN]\label{thm:bridge}
+A duration-$n$ sequence with $g$ gurus has $n-2g$ laghus, $n-g$ syllables, and $\binom{n-g}{g}$ arrangements. Hence
+\[
+F_{n+1} = \sum_{g} \binom{n-g}{g}.
+\]
+The Fibonacci count is the binomial count refined by guru number: the shallow-diagonal sum of the binomial triangle, which is the content of the \skt{Prākṛta Paiṅgala} \skt{mātrā-meru} (Singh 1985).
+\end{theorem}
+\begin{proof}
+Choose which $g$ of the $n-g$ syllables are gurus. Checked for $n \le 64$ (the extent of the binomial table); per-guru counts checked for $n \le 20$.
+\end{proof}
+
+\paragraph{Fibonacci in $O(\log n)$.} Fast doubling: $F_{2m} = F_m(2F_{m+1} - F_m)$ and $F_{2m+1} = F_m^2 + F_{m+1}^2$. This is the \skt{saṅkhyā} squaring pattern applied to a different recurrence.
+
+\paragraph{Cost.} $O(n)$ steps, one $O(\log n)$ Fibonacci evaluation per step (or a 94-entry constant table, since $F_{93}$ is the largest Fibonacci number that fits in a \code{u64}). No allocation.
+
+\begin{remark}[The \skt{mātrā} constraint is a recording-channel constraint]
+Write a duration-$n$ sequence as $n$ unit morae with a mark in each of the $n-1$ gaps: 1 if the two morae are joined into one guru, 0 if they are separate. A valid sequence never joins three morae, so the gap string never has two adjacent 1s. This is a bijection between \skt{mātrā} metres of duration $n$ and binary strings of length $n-1$ with no two adjacent 1s: the $d=1$ run-length-limited constraint of magnetic and optical recording (Marcus, Roth \& Siegel 1998). Its information rate is $\log_2 \varphi \approx 0.694$ bits per mora (Shannon 1948), against 1 bit per syllable for the unconstrained positional metre. One search (13 October 2026) found no source identifying Virahāṅka's metres with the RLL constraint; this is a reading, not a priority claim.
+\end{remark}
+
+% =====================================================================
+\section{One lattice: the addressings compared}\label{sec:lattice}
+
+{\small
+\noindent\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.27\linewidth}>{\raggedright\arraybackslash}p{0.11\linewidth}>{\raggedright\arraybackslash}p{0.22\linewidth}X@{}}
+\toprule
+\textbf{Constraint} & \textbf{Count} & \textbf{Unrank method} & \textbf{Prosodic source}\\
+\midrule
+fixed length $n$ & $2^n$ & binary digits of $k-1$ & Piṅgala 8.24--8.27: \skt{naṣṭa}/\skt{uddiṣṭa}\\
+fixed length $n$, $r$ laghus & $\binom{n}{r}$ & greedy on binomials & \skt{lagakriyā} (Bharata); \skt{sūci}- and \skt{meru-prastāra} (Virahāṅka)\\
+fixed length $n$, $r$ non-zero signed digits & $\binom{n}{r}2^r$ & greedy on binomials, then sign bits & (extension, §\ref{sec:signed})\\
+fixed duration $n$ & $F_{n+1}$ & greedy on Fibonacci & Virahāṅka; \skt{mātrā-meru} (\skt{Prākṛta Paiṅgala})\\
+\bottomrule
+\end{tabularx}
+}
+
+\medskip
+Each row is a numeration system whose place values are the counts of the constrained space (powers of two, binomials, Fibonacci numbers). Unranking means writing $k$ in that system.
+
+\begin{remark}[The lattice, stated precisely]
+Every row is path counting in a small finite automaton: the unconstrained metre is one state with two edges; the \skt{mātrā} metre tracks the remaining duration; the weight constraint tracks the laghu count. In each case the count is a sum of entries of a matrix power $A^n$ (the transfer-matrix method; Stanley, EC1 §4.7), and unranking is the greedy walk against path counts that Cover (1973) calls enumerative coding. \skt{Saṅkhyā}'s halve-and-square is $A^n$ by repeated squaring, and the \skt{sūci-prastāra} is $L^k$ (§\ref{sec:suci}). This is the sense in which the addressings are one lattice. They are not isomorphic to each other; they are instances of one construction.
+\end{remark}
+
+% =====================================================================
+\clearpage
+\section{Engineering mapping}\label{sec:eng}
+
+{\small
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.15\linewidth}>{\raggedright\arraybackslash}p{0.08\linewidth}p{0.49\linewidth}>{\raggedright\arraybackslash}p{0.18\linewidth}@{}}
+\toprule
+\textbf{Use} & \textbf{Scheme} & \textbf{Why it fits} & \textbf{Status}\\
+\midrule\endhead
+\bottomrule\endfoot
+Deterministic state $\#k$ with no lookup table & I & Index $\to$ state in $O(n)$ integer ops; nothing allocated. \textbf{Bounded, two numbers}: at one byte of state ($3^5 = 243$ codes), a 64\,KB pair-distance table against register decode on a desktop x86 core (Zen~3), working sets 32\,KB to 2\,MB, warm and after a 64\,MB evict alike. \textbf{Throughput} (independent ops): table 0.8--1.6\,ns/op vs decode 6.9--9.6, 6--9$\times$. \textbf{Latency} (each input derived from the previous result): table 3.5--4.9\,ns/op vs decode 9.1--10.5, 2.0--2.6$\times$. An explicit multiply-shift decode is within noise of plain decode in both (6.6--7.7 throughput, 8.7--9.4 latency). The decode cost is the dependent chain of digit extractions, not the divide: the compiler already strength-reduces a constant divisor. Below about 16\,K ops after an evict the table loses in latency (re-warming 64\,KB is not amortised). Table-free wins only where a table cannot live: wide states ($3^{13}$ and up), register-only GPU kernels, \code{no\_std} targets without a data cache. & \DESIGN{} (bench measured; harness in repo, App.~\ref{app:receipts})\\
+Exactly $r$ active of $n$ (voices, channels, capability bits) & II & Dense index over valid states only; invalid states cannot be addressed at all. & \DESIGN\\
+Exactly $r$ non-zero of $n$ \textbf{signed} digits & II$\times$I & Theorem~\ref{thm:signed}. \textbf{Re-derivation} of enumerative coding (Cover 1973; Schalkwijk 1972) for a ternary constant-weight set; the refinement by sign count $\binom{n}{r}\binom{r}{p}$ is the constant-composition case and the multinomial Nārāyaṇa's \skt{sūcī-paṅkti} counts. At one byte ($n=5$) the 243 $(r,\mathrm{rank})$ pairs are a table generated at compile time \emph{from} the formula: the formula is the generator and validator, the table is the hot path. & \PROVEN{} ($3^{13}$ exhaustive); integration \DESIGN\\
+Rhythm space under a fixed bar length & III & Enumerates every subdivision of $n$ ticks into 1- and 2-tick units, densely and in order. & \DESIGN\\
+Division-free binomial tables & II (\skt{sūci}) & Iterated scans; add-only integer path; maps onto SIMD scan. Built as a compile-time table in the reference implementation (§\ref{sec:weight}). & \BUILT{} (reference); SIMD \DESIGN\\
+Sequence acceptance & I--III & A \emph{sequence} (a metre, a \skt{mātrā} string, a support mask) is well-formed iff ranking it and unranking the result gives it back. The rank round-trip is an acceptance test for the \textbf{input alphabet}, nothing more. & \DESIGN\\
+ID integrity & I--III & A dense ID carries zero redundancy by construction: every integer in $[0,\mathrm{count})$ is some valid state, so a flipped bit decodes to a valid \emph{wrong} state and no round-trip can notice. Integrity in flight needs a check field or reserved capacity added on top; the addressing itself gives none. & \DESIGN\\
+\end{longtable}
+}
+
+Prior-art search for the signed-weight row (13 October 2026, query ``ternary constant-composition code enumerative ranking''): the hits are existence and classification results for ternary constant-composition codes (Bogdanova \& Kapralov 2003; Chee, Ge \& Ling; Gao \& Ge), none on ranking or unranking. The search was not empty, so no candidate claim is made; the row stays a re-derivation of Cover/Schalkwijk.
+
+The reference implementation (Appendix~\ref{app:receipts}) is \code{no\_std}, integer-only, and allocation-free. The remaining rows are promoted to \BUILT{} once it is lifted into a production workspace with benches.
+
+% =====================================================================
+\section{Thesis}\label{sec:thesis}
+
+Piṅgala, Shao Yong, Leibniz and Shannon arrived at binary enumeration independently. Virahāṅka, Gopāla, Hemacandra and Fibonacci arrived at the \skt{mātrā} recurrence independently. The binomial triangle appears in India, Persia, China and Europe. These recurrences are not cultural borrowings. They are what you get when you have to count a discrete space under a hard constraint, and they are found again because they are forced by that problem rather than chosen. The Indian record is notable for three reasons: the constraint was linguistic, the methods were algorithmic rather than tabular, and the inverse map (index $\to$ object) was stated explicitly. That inverse map is the part a zero-allocation system needs.
+
+% =====================================================================
+\section{Open items before release}\label{sec:open}
+
+\begin{enumerate}[label=\arabic*.]
+\item \VERIFY{} Velankar's 1962 edition of the \skt{Vṛttajātisamuccaya} not consulted directly; verses 6.7--6.12 are read in Shah's translation.
+\item \VERIFY{} Publisher imprint of Kāvyamālā 91.
+\item \VERIFY{} Weber's date: Shah gives 1835 in prose and 1863 in the reference list.
+\item \emph{Resolved} (was: the §\ref{sec:eng} row~1 bench harness lived outside the code repository): a self-contained copy is \code{prastara/examples/byte\_pair\_distance\_bench.rs}; the Appendix~\ref{app:receipts} numbers are from that copy.
+\item DOI reserved (10.5281/zenodo.23334659); the Zenodo record is published together with the release tag.
+\end{enumerate}
+
+% =====================================================================
+\begin{thebibliography}{99}\small
+\setlength{\itemsep}{2pt}
+
+\bibitem{pingala} Piṅgala. \emph{Chandaḥśāstram}, with Halāyudha's \emph{Mṛtasañjīvanī} and Madhusūdana's \emph{Chandonirukti}. Ed.\ Kedāranātha. Kāvyamālā 91, Bombay, 1938. \VERIFY{} publisher imprint not seen; commonly given as Nirnaya Sagar Press.
+\bibitem{virahanka} Virahāṅka. \emph{Vṛttajātisamuccaya}, with Gopāla's commentary. Ed.\ H.~D. Velankar. Rajasthan Oriental Research Institute, Jodhpur, 1962 (Rajasthan Puratana Granthamala 61). \VERIFY{} not consulted directly.
+\bibitem{shah} J.~Shah. A history of Piṅgala's combinatorics. Preprint, 2008, 44~pp. Published as \emph{Gaṇita Bhāratī} 35(1--2), 2013, 1--54. Page numbers in this paper refer to the preprint.
+\bibitem{kulkarni} A.~Kulkarni. Recursion and combinatorial mathematics in Chandaśśāstra. arXiv:math/0703658v2 [math.HO], 2008.
+\bibitem{weber} A.~Weber. \emph{Über die Metrik der Inder.} Berlin, 1863 (Indische Studien 8). \VERIFY{} date.
+\bibitem{alsdorf} L.~Alsdorf. Die Pratyayas. Ein Beitrag zur indischen Mathematik. \emph{Zeitschrift für Indologie und Iranistik} 9 (1933), 97--157. English tr.\ S.~R. Sarma, \emph{Indian Journal of History of Science} 26(1), 1991.
+\bibitem{vannooten} B.~Van Nooten. Binary numbers in Indian antiquity. \emph{Journal of Indian Philosophy} 21(1) (1993), 31--50.
+\bibitem{singh} P.~Singh. The so-called Fibonacci numbers in ancient and medieval India. \emph{Historia Mathematica} 12(3) (1985), 229--244. doi:10.1016/0315-0860(85)90021-7.
+\bibitem{sridharan} Raja Sridharan, R.~Sridharan, M.~D. Srinivas. Nārāyaṇa Paṇḍita's enumeration of combinations and associated representation of numbers as sums of binomial coefficients. \emph{Indian Journal of History of Science} 47 (2012), 607--631.
+\bibitem{kusuba} T.~Kusuba. \emph{Combinatorics and Magic Squares in India: A Study of Nārāyaṇa Paṇḍita's Gaṇitakaumudī, Chapters 13--14.} PhD thesis, Brown University, 1993.
+\bibitem{datta} B.~Datta, A.~N. Singh. \emph{History of Hindu Mathematics.} 1935--38.
+\bibitem{maitre} M.-J. Maitre. Is the \emph{Fuxi liushisi gua fangwei} diagram attributed to Shao Yong binary? \emph{Science in Context}, 2025.
+\bibitem{leibniz1679} G.~W. Leibniz. \emph{De progressione dyadica.} MS dated 15 March 1679, Niedersächsische Landesbibliothek, Hannover. Facsimile: Hochstetter \& Greve, 1966.
+\bibitem{leibniz1703} G.~W. Leibniz. Explication de l'Arithmétique Binaire. \emph{Mémoires de l'Académie Royale des Sciences}, 1703 (printed 1705). Leibniz--Bouvet correspondence: \url{https://archive.swarthmore.edu/leibniz-bouvet}.
+\bibitem{ingerman} P.~Z. Ingerman. ``Pāṇini--Backus Form'' suggested. \emph{Communications of the ACM} 10(3) (1967), 137. doi:10.1145/363162.363165.
+\bibitem{shannon} C.~E. Shannon. A mathematical theory of communication. \emph{Bell System Technical Journal} 27 (1948), 379--423, 623--656.
+\bibitem{schalkwijk} J.~P.~M. Schalkwijk. An algorithm for source coding. \emph{IEEE Transactions on Information Theory} 18(3) (1972), 395--399.
+\bibitem{cover} T.~M. Cover. Enumerative source encoding. \emph{IEEE Transactions on Information Theory} 19(1) (1973), 73--77.
+\bibitem{mrs} B.~H. Marcus, R.~M. Roth, P.~H. Siegel. Constrained systems and coding for recording channels. In V.~S. Pless, W.~C. Huffman (eds.), \emph{Handbook of Coding Theory}, Elsevier, 1998.
+\bibitem{stanley} R.~P. Stanley. \emph{Enumerative Combinatorics}, Vol.~1, §4.7 (the transfer-matrix method). Cambridge University Press, 2nd ed., 2012.
+\bibitem{bogdanova} G.~Bogdanova, S.~Kapralov. Enumeration of optimal ternary constant-composition codes. \emph{Problems of Information Transmission} 39(4), 2003. doi:10.1023/B:PRIT.0000011273.98799.a8.
+\bibitem{blelloch} G.~E. Blelloch. Prefix sums and their applications. Technical report CMU-CS-90-190, 1990.
+\bibitem{dakkak} A.~Dakkak, C.~Li, J.~Xiong, I.~Gelado, W.-m. Hwu. Accelerating reduction and scan using tensor core units. \emph{Proc.\ ACM International Conference on Supercomputing (ICS '19)}, 2019.
+\bibitem{knuth} D.~E. Knuth. \emph{The Art of Computer Programming}, Vol.~4A, §7.2.1.3 (combinations) and §7.2.1.7 (history of generation).
+\end{thebibliography}
+
+% =====================================================================
+\clearpage
+\appendix
+\section{Reference implementation and receipts}\label{app:receipts}
+
+\code{prastara/src/lib.rs} in \href{https://github.com/13forge/proofs}{github.com/13forge/proofs} is \code{no\_std} with no \code{alloc} crate (the test module alone uses \code{std}). Outside the test module it contains no division instruction: the halvings in \skt{naṣṭa} are shifts, and the binomials come from the compile-time \skt{sūci} table. It carries sixteen exhaustive tests, run with \code{cargo test --release} from the repository root. In the code, bit $i = 1$ means syllable $i$ is \textbf{laghu}, per §\ref{sec:enc}; the \code{nashta} rule ``$k$ even $\to$ set bit'' is sūtra 8.24 read literally.
+
+{\small
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.42\linewidth}>{\raggedright\arraybackslash}p{0.2\linewidth}>{\raggedright\arraybackslash}p{0.3\linewidth}@{}}
+\toprule
+\textbf{Test} & \textbf{Covers} & \textbf{Range}\\
+\midrule\endhead
+\bottomrule\endfoot
+\code{nashta\_is\_binary\_of\_k\_minus\_1} & Thm~\ref{thm:pos} & $n \le 20$, all $k$\\
+\code{uddishta\_inverts\_nashta} & Thm~\ref{thm:pos} & $n \le 20$, all $k$\\
+\code{sankhya\_is\_pow2} & §\ref{sec:pos} \skt{saṅkhyā} & $n \le 63$\\
+\code{row\_with\_r\_laghus\_counts\_binomial} & §\ref{sec:weight} count & $n \le 20$\\
+\code{combinadic\_is\_bijection\_onto\_weight\_r} & Thm~\ref{thm:comb} & $n \le 20$, all $r$, all $k$\\
+\code{suci\_table\_matches\_multiplicative\_binom} & §\ref{sec:weight} table & $n \le 64$, all $k$ (\code{u128} oracle)\\
+\code{hockey\_stick\_column\_prefix\_sum} & Thm~\ref{thm:suci}, identity & $r \le 20$, $n \le 60$\\
+\code{suci\_iterated\_scan\_is\_binomial} & Thm~\ref{thm:suci}, scan & $k \le 16$, $i < 48$\\
+\code{pext\_pdep\_hardware\_matches\_portable} & Thm~\ref{thm:signed}, BMI2 $=$ portable & all 12-bit (x, mask) pairs at offsets 0 and 52; all $3^{13}$ (sign, support) pairs\\
+\code{pext\_pdep\_dispatch\_matches\_portable} & Thm~\ref{thm:signed}, dispatch & all $3^{13}$\\
+\code{signed\_weight\_collapse\_3\_pow\_13} & Thm~\ref{thm:signed} & all $1\,594\,323$ states: round-trip, bound, every class covered once\\
+\code{signed\_weight\_collapse\_small\_widths} & Thm~\ref{thm:signed} & every $n \le 9$\\
+\code{signed\_max\_n\_is\_the\_u64\_ceiling} & Thm~\ref{thm:signed}, \code{u64} bound & $3^{40} < 2^{64} < 3^{41}$\\
+\code{matra\_unrank\_matches\_brute\_force\_lex} & Thm~\ref{thm:matra} & $n \le 20$, vs brute force\\
+\code{shallow\_diagonal\_is\_matra\_count} & Thm~\ref{thm:bridge} & $n \le 64$\\
+\code{matra\_by\_guru\_count\_is\_binomial} & Thm~\ref{thm:bridge}, per guru & $n \le 20$\\
+\end{longtable}
+}
+
+\paragraph{Receipts.} 13 October 2026, Windows 11 x86\_64 (AMD Ryzen~7 5800X3D), all exit 0.
+
+{\footnotesize\setlength{\tabcolsep}{4pt}
+\noindent\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.2\linewidth}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}p{0.24\linewidth}r@{}}
+\toprule
+\textbf{Toolchain} & \textbf{Build} & \textbf{Result} & \textbf{Wall}\\
+\midrule
+\textbf{stable} rustc 1.95.0 & \code{cargo +stable test --release} & 16 passed; pext dispatch $=$ portable & 0.45\,s\\
+beta rustc 1.100.0-beta.4 & \code{cargo test --release} & 16 passed; pext dispatch $=$ portable & 0.40\,s\\
+beta rustc 1.100.0-beta.4 & \code{RUSTFLAGS=-C target-feature=+bmi2 cargo test --release} & 16 passed; pext dispatch $=$ BMI2 & 0.37\,s\\
+beta rustc 1.100.0-beta.4 & \code{cargo build --release --target wasm32-unknown-unknown} & \code{no\_std} library builds & 25.7\,s\\
+\bottomrule
+\end{tabularx}
+}
+
+\paragraph{Bench behind §\ref{sec:eng} row 1.} Harness: \code{prastara/examples/byte\_pair\_distance\_bench.rs}, self-contained, no dependencies. Run with\\[2pt]\hspace*{1.5em}\code{cargo +stable run --release --example byte\_pair\_distance\_bench}\\[2pt]LUT $=$ 64\,KB pair table built at compile time from DEC; DEC $=$ register decode by successive digit extraction (\code{/ 3}, \code{\% 3}); MUL $=$ explicit multiply-shift decode. TP $=$ throughput (independent ops); LAT $=$ latency (each input derived from the previous result); cold $=$ after a 64\,MB evict. Stable rustc 1.95.0 (59807616e), ns/op, 6 reps per cell, same machine as the tests, exit 0.
+
+{\footnotesize\setlength{\tabcolsep}{4pt}
+\noindent\begin{tabularx}{\linewidth}{@{}r*{4}{>{\centering\arraybackslash}X}@{}}
+\toprule
+\textbf{Items} & \textbf{TP warm} & \textbf{TP cold} & \textbf{LAT warm} & \textbf{LAT cold}\\
+ & \footnotesize LUT / DEC / MUL & \footnotesize LUT / DEC / MUL & \footnotesize LUT / DEC / MUL & \footnotesize LUT / DEC / MUL\\
+\midrule
+1\,024 & 2.00 / 7.96 / 8.37 & 7.28 / 7.78 / 7.45 & 10.99 / 9.33 / 8.69 & 21.83 / 9.64 / 9.00\\
+16\,384 & 1.02 / 7.96 / 7.67 & 1.65 / 9.56 / 7.03 & 3.89 / 9.23 / 8.74 & 4.88 / 9.86 / 9.03\\
+24\,576 & 0.96 / 7.15 / 9.33 & 1.28 / 7.30 / 6.68 & 4.79 / 10.47 / 8.89 & 3.93 / 9.42 / 8.66\\
+40\,000 & 0.87 / 7.07 / 6.66 & 0.97 / 7.74 / 6.58 & 3.71 / 9.13 / 9.39 & 3.94 / 9.17 / 8.78\\
+131\,072 & 0.84 / 6.93 / 6.94 & 0.88 / 6.95 / 7.31 & 4.04 / 9.35 / 9.02 & 3.53 / 9.14 / 8.88\\
+1\,048\,576 & 0.83 / 7.15 / 6.71 & 0.86 / 7.37 / 6.71 & 3.62 / 9.53 / 8.83 & 3.58 / 9.43 / 9.19\\
+\bottomrule
+\end{tabularx}
+}
+
+\medskip
+A 64-item row was measured and excluded as timer-bound. At 1\,024 items the table loses in latency, warm (10.99 vs 9.33) and above all cold (21.83 vs 9.64): with that few operations, re-warming the evicted 64\,KB is not amortised. From 16\,384 items up the table wins in every column. MUL and DEC are within run-to-run noise of each other (single cells such as 9.33 at 24\,576 warm are noise, not a trend). Beta rustc 1.100.0-beta.4 gives the same shape with DEC about 1\,ns faster in latency (8.2--8.5\,ns/op), ratios 2.0--2.4$\times$.
+
+\end{document}
