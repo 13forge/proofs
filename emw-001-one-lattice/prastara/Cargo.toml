@@ -1,0 +1,12 @@
+[package]
+name = "prastara"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"
+authors = ["Sean Morin <dev@deveraux.dev>"]
+license = "MIT OR Apache-2.0"
+description = "Table-free, zero-allocation state unranking from Sanskrit prosody: naṣṭa/uddiṣṭa, sūci-prastāra, combinadic, mātrā (Zeckendorf)."
+repository = "https://github.com/13forge/proofs"
+publish = false
+
+[dependencies]
