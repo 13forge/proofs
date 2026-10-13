@@ -2,7 +2,7 @@
 ### State unranking in Sanskrit prosody and zero-allocation integer systems
 
 **Sean (Deveraux)** · 2748684 Alberta Ltd · deveraux.dev
-**Series:** East Meets West, EMW-001 · **Status:** DRAFT v0.2 (2026-10-12; v0.1 2026-10-13 UTC)
+**Series:** East Meets West, EMW-001 · **Status:** DRAFT v0.3 (2026-10-13; v0.2 2026-10-12; v0.1 2026-10-13 UTC)
 **Licence:** text CC BY 4.0 · code MIT OR Apache-2.0
 
 ---
@@ -97,7 +97,7 @@ The number of *n*-syllable metres with exactly *r* laghus is C(*n*, *r*). Lagakr
 >
 > *Proof.* Standard (Lehmer; Knuth TAOCP 7.2.1.3). Exhaustively checked for *n* ≤ 20 in Appendix A. ∎
 
-**Cost:** O(*n*) binomial evaluations. Binomials come from the multiplicative formula, so no table is needed.
+**Cost:** O(*n*) binomial evaluations. In the reference implementation the binomials come from a compile-time table built by the sūci-prastāra of §5.1 (add-only; 65 × 65 entries, every C(*n*, *k*) with *n* ≤ 64), so the unranking path contains no division. The multiplicative formula, which divides, is kept only as a test oracle for that table.
 
 ### 5.1 Sūci-prastāra: the binomials as an iterated scan
 
@@ -121,6 +121,18 @@ Bharata, and after him Virahāṅka under the name sūci-prastāra, build the bi
 3. Sūci is **add-only and division-free**. In an integer-deterministic runtime, that removes the only division in the binomial path. This is the property 13Forge actually wants.
 4. Bench, as a DESIGN_TARGET: iterated SIMD scan vs in-place row update vs multiplicative formula, for *n* ≤ 4096 and *k* ≤ 64. The hypothesis is parity between the first two. The point of the bench is the division-free result, not raw speed.
 
+### 5.2 Signed weight: exactly *r* non-zero digits in {−1, 0, +1}ⁿ
+
+Split a balanced-ternary vector into its **support** *s* (bit *i* set iff digit *i* ≠ 0) and its **sign pattern** *p* ⊆ *s* (bit *i* set iff digit *i* = +1). Let *r* = |*s*|.
+
+> **Theorem 6 (PROVEN). Signed-weight address.** For fixed *n* and *r*, the map
+> **rank(*s*, *p*) = combinadic_rank(*s*) · 2ʳ + pext(*p*, *s*)**
+> is a bijection from the vectors with exactly *r* non-zero digits onto [0, C(*n*, *r*) · 2ʳ), where pext(*p*, *s*) packs the bits of *p* at the positions of *s* into an *r*-bit integer. The inverse is *s* = combinadic_unrank(⌊*k* / 2ʳ⌋), *p* = pdep(*k* mod 2ʳ, *s*). The classes *r* = 0 … *n* partition the 3ⁿ vectors.
+>
+> *Proof.* Theorem 2 gives the bijection supports ↔ [0, C(*n*, *r*)). For a fixed support, pext/pdep are mutually inverse bijections between sign patterns and [0, 2ʳ). Composing by the mixed radix (C(*n*, *r*), 2ʳ) gives the result. Σᵣ C(*n*, *r*) 2ʳ = 3ⁿ by the binomial theorem. Exhaustively checked over all 3¹³ = 1 594 323 vectors and at every width *n* ≤ 9 (Appendix A). ∎
+
+This is enumerative coding (Cover 1973; the fixed-weight case is Schalkwijk 1972) under the lexicographic order (support, then sign pattern), applied to a ternary constant-weight set. It is a re-derivation, not a new method. The division is again absent: ⌊*k* / 2ʳ⌋ and *k* mod 2ʳ are a shift and a mask, and the binomials are the §5.1 table. pext/pdep are the BMI2 instructions on x86-64; the reference implementation uses a portable O(*r*) loop by default and the instructions only when the build enables them, and checks the two bit-identical. The address fits a u64 for *n* ≤ 40 (3⁴⁰ < 2⁶⁴ < 3⁴¹).
+
 ---
 
 ## 6. Addressing III: duration-constrained (mātrā)
@@ -135,7 +147,7 @@ Let M(*n*) be the number of L/G sequences of total duration *n*, with L = 1 and 
 > **F(*n*+1) = Σ_g C(*n*−*g*, *g*)**.
 > The Fibonacci count is the binomial count refined by guru number, which is the shallow-diagonal sum of the binomial triangle. This is the content of the *Prākṛta Paiṅgala* mātrā-meru (Singh 1985).
 >
-> Checked for *n* ≤ 80, and per-guru counts checked for *n* ≤ 20.
+> Checked for *n* ≤ 64 (the extent of the binomial table), and per-guru counts checked for *n* ≤ 20.
 
 **Fibonacci in O(log n).** Fast doubling: F(2*m*) = F(*m*)(2F(*m*+1) − F(*m*)) and F(2*m*+1) = F(*m*)² + F(*m*+1)². This is the saṅkhyā squaring pattern applied to a different recurrence. The same procedure computes both counts.
 
@@ -159,14 +171,17 @@ Each row is a numeration system whose place values are the counts of the constra
 
 | Use | Addressing | Why it fits | Status |
 |---|---|---|---|
-| Deterministic state #*k* with no lookup table | I | Index → state in O(*n*) integer ops; nothing allocated. **Bounded:** at one byte of state a 64 KB pair table measured about 6× faster than register decode on a desktop x86 core, warm and after a 64 MB cache evict alike. Table-free wins only where a table cannot live: wide states (3¹³ and up), register-only GPU kernels, no_std targets without a data cache. | DESIGN_TARGET (bench exists, local) |
+| Deterministic state #*k* with no lookup table | I | Index → state in O(*n*) integer ops; nothing allocated. **Bounded, two numbers:** at one byte of state (3⁵ = 243 codes), comparing a 64 KB pair-distance table against register decode on a desktop x86 core (Zen 3), working sets of 32 KB to 2 MB, warm and after a 64 MB cache evict alike: in **throughput** (independent ops) the table runs 0.8–1.2 ns/op against 7.2–7.9 ns/op for decode, 6–9×; in **latency** (each op's inputs derived from the previous result) the table runs 3.4–4.5 ns/op against 10.4–11.9 ns/op for decode, 2.3–3.1×. An explicit multiply-shift decode (no divide instruction) sits at 7.0–7.2 ns/op throughput and 8.6–9.2 ns/op latency, 2.0–2.6× the table in latency. The decode cost is the dependent chain of digit extractions, not the divide: the compiler already strength-reduces a constant divisor. Table-free wins only where a table cannot live: wide states (3¹³ and up), register-only GPU kernels, no_std targets without a data cache. | DESIGN_TARGET (bench exists, local) |
 | Exactly *r* active of *n* (voices, channels, capability bits) | II | Dense index over valid states only; invalid states can't be addressed at all | DESIGN_TARGET |
-| Exactly *r* non-zero of *n* **signed** digits (balanced ternary) | II × I | Class size C(*n*,*r*)·2ʳ. Address = combinadic rank of the support, shifted left *r*, OR the *r* sign bits compressed onto the support. This is enumerative coding (Cover 1973) under the lexicographic order (support, then sign); the refinement by sign count C(*n*,*r*)·C(*r*,*p*) is the multinomial Nārāyaṇa's sūcī-paṅkti counts. | DESIGN_TARGET |
+| Exactly *r* non-zero of *n* **signed** digits (balanced ternary) | II × I | Theorem 6: class size C(*n*,*r*)·2ʳ, address = combinadic rank of the support, shifted left *r*, OR the sign bits compressed onto the support. **Re-derivation** of enumerative coding (Cover 1973; Schalkwijk 1972) for a ternary constant-weight set; the refinement by sign count C(*n*,*r*)·C(*r*,*p*) is the constant-composition case and the multinomial Nārāyaṇa's sūcī-paṅkti counts. At one byte (*n* = 5) the 243 (*r*, rank) pairs are a table generated at compile time *from* the formula; the formula is the generator and validator, the table is the hot path. | PROVEN (3¹³ exhaustive); integration DESIGN_TARGET |
 | Rhythm space under a fixed bar length | III | Enumerates every subdivision of *n* ticks into 1- and 2-tick units, densely and in order | DESIGN_TARGET |
-| Division-free binomial tables | II (sūci) | Iterated scans; add-only integer path; maps onto SIMD scan | DESIGN_TARGET |
-| Ingress validation | I–III | The ranking function doubles as a validator: a state is well-formed iff ranking it round-trips | DESIGN_TARGET |
+| Division-free binomial tables | II (sūci) | Iterated scans; add-only integer path; maps onto SIMD scan. Built as a compile-time table in the reference implementation (§5) | BUILT (reference); SIMD DESIGN_TARGET |
+| Sequence acceptance | I–III | A *sequence* (a metre, a mātrā string, a support mask) is well-formed iff ranking it and unranking the result gives it back: a mātrā string whose durations do not sum to *n*, or a support with the wrong weight, cannot round-trip. The rank round-trip is an acceptance test for the **input alphabet**, nothing more. | DESIGN_TARGET |
+| ID integrity | I–III | A dense ID carries zero redundancy by construction: every integer in [0, count) is some valid state, so a flipped bit in the ID decodes to a valid *wrong* state and no round-trip can notice. Integrity of an ID in flight needs a check field or reserved capacity (addresses above the count) added on top; the addressing itself gives none. | DESIGN_TARGET |
 
-The reference implementation (Appendix A) is `no_std`, integer-only, and allocation-free. Promote these rows to **BUILT** once it is lifted into the workspace with benches.
+Prior-art search for the signed-weight row (2026-10-13, query "ternary constant-composition code enumerative ranking"): the hits are existence and classification results for ternary constant-composition codes (Bogdanova & Kapralov 2003; Chee, Ge & Ling; Gao & Ge), none on ranking or unranking. The search was not empty, so no candidate claim is made; the row stays a re-derivation of Cover/Schalkwijk.
+
+The reference implementation (Appendix A) is `no_std`, integer-only, and allocation-free. Promote the remaining rows to **BUILT** once it is lifted into the workspace with benches.
 
 ---
 
@@ -196,6 +211,8 @@ Page numbers for Shah refer to the 2008 preprint (44 pp.), which is the text we 
 - Leibniz, G. W. (1703, printed 1705). Explication de l'Arithmétique Binaire. *Mémoires de l'Académie Royale des Sciences.* Leibniz–Bouvet correspondence: archive.swarthmore.edu/leibniz-bouvet (letter of 4 Nov 1701, received 1 Apr 1703).
 - Ingerman, P. Z. (1967). "Pāṇini–Backus Form" suggested. *Communications of the ACM* 10(3), 137. doi:10.1145/363162.363165.
 - Cover, T. M. (1973). Enumerative source encoding. *IEEE Transactions on Information Theory* 19(1), 73–77.
+- Schalkwijk, J. P. M. (1972). An algorithm for source coding. *IEEE Transactions on Information Theory* 18(3), 395–399.
+- Bogdanova, G. & Kapralov, S. (2003). Enumeration of optimal ternary constant-composition codes. *Problems of Information Transmission* 39(4). doi:10.1023/B:PRIT.0000011273.98799.a8. (Classification, not ranking; cited as the nearest prior-art hit.)
 - Blelloch, G. E. (1990). Prefix sums and their applications. CMU-CS-90-190.
 - Knuth, D. E. *The Art of Computer Programming*, Vol. 4A, §7.2.1.3 (combinations) and §7.2.1.7 (history of generation).
 
@@ -203,23 +220,38 @@ Page numbers for Shah refer to the 2008 preprint (44 pp.), which is the text we 
 
 ## Appendix A — Reference implementation and receipts
 
-[`prastara/src/lib.rs`](prastara/src/lib.rs) contains ten exhaustive tests. Run them with `cargo test --release` from the repo root:
+[`prastara/src/lib.rs`](prastara/src/lib.rs) is `no_std` with no `alloc` crate (the test module alone uses `std`), contains no division, and carries sixteen exhaustive tests. Run them with `cargo test --release` from the repo root:
 
 ```
 cargo test --release
+test tests::suci_table_matches_multiplicative_binom .. ok   (n ≤ 64, all k: compile-time sūci table == multiplicative formula)
 test tests::nashta_is_binary_of_k_minus_1 ............ ok   (n ≤ 20, all k)
 test tests::uddishta_inverts_nashta .................. ok   (n ≤ 20, all k)
 test tests::sankhya_is_pow2 .......................... ok   (n ≤ 63)
 test tests::row_with_r_laghus_counts_binomial ........ ok   (n ≤ 20)
 test tests::combinadic_is_bijection_onto_weight_r .... ok   (n ≤ 20, all r, all k)
 test tests::hockey_stick_column_prefix_sum ........... ok   (r ≤ 20, n ≤ 60)
-test tests::suci_iterated_scan_is_binomial ........... ok   (k ≤ 20, i < 48)
-test tests::shallow_diagonal_is_matra_count .......... ok   (n ≤ 80)
+test tests::suci_iterated_scan_is_binomial ........... ok   (k ≤ 16, i < 48)
+test tests::shallow_diagonal_is_matra_count .......... ok   (n ≤ 64)
 test tests::matra_unrank_matches_brute_force_lex ..... ok   (n ≤ 20, vs brute force)
 test tests::matra_by_guru_count_is_binomial .......... ok   (n ≤ 20)
-test result: ok. 10 passed; 0 failed; 0 ignored — finished in 0.42s
+test tests::pext_pdep_hardware_matches_portable ...... ok   (BMI2 vs portable: all 12-bit (x, mask) pairs at offsets 0 and 52, all 3¹³ (sign, support) pairs)
+test tests::pext_pdep_dispatch_matches_portable ...... ok   (the build's pext/pdep vs portable, all 3¹³)
+test tests::signed_weight_collapse_3_pow_13 .......... ok   (all 1 594 323 states: unrank(rank(x)) = x, rank < C(13,r)·2ʳ, every class covered exactly once)
+test tests::signed_weight_collapse_small_widths ...... ok   (same, every n ≤ 9)
+test tests::signed_max_n_is_the_u64_ceiling .......... ok   (3⁴⁰ < 2⁶⁴ < 3⁴¹)
+test result: ok. 16 passed; 0 failed; 0 ignored — finished in 0.40s
 ```
 
-Reference run: 2026-10-12, Windows 11 x86_64 (AMD Ryzen 7 5800X3D), rustc 1.100.0-beta.4, `cargo test --release`, exit 0. Re-run locally to reproduce.
+Receipts, 2026-10-13, Windows 11 x86_64 (AMD Ryzen 7 5800X3D), all exit 0:
+
+| Toolchain | Build | Result | Wall |
+|---|---|---|---|
+| **stable** rustc 1.95.0 (59807616e 2026-04-14) | `cargo +stable test --release` | 16 passed, 0 failed; pext dispatch = portable | 0.45 s |
+| beta rustc 1.100.0-beta.4 | `cargo test --release` | 16 passed, 0 failed; pext dispatch = portable | 0.40 s |
+| beta rustc 1.100.0-beta.4 | `RUSTFLAGS=-C target-feature=+bmi2 cargo test --release` | 16 passed, 0 failed; pext dispatch = BMI2 hardware | 0.37 s |
+| beta rustc 1.100.0-beta.4 | `cargo build --release --target wasm32-unknown-unknown` | `no_std` library builds | 25.7 s |
+
+The byte-width bench behind §8 row 1 (stable rustc 1.95.0 primary; beta 1.100.0-beta.4 agrees within noise) ran 6 reps per cell and reports ns/op; the full table is in the bench source's output, not reproduced here.
 
 In the code, bit *i* = 1 means syllable *i* is **laghu**, per §3. The `nashta` rule `k even → set bit` is sūtra 8.24 read literally.

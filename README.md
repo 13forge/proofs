@@ -15,7 +15,7 @@ Every paper here tags each claim with one of these statuses:
 
 | ID | Title | Status | Code |
 |---|---|---|---|
-| EMW-001 | [One Lattice, Three Addresses: state unranking in Sanskrit prosody and zero-allocation integer systems](emw-001-one-lattice/paper.md) | Draft v0.2 | [`prastara`](emw-001-one-lattice/prastara) |
+| EMW-001 | [One Lattice, Three Addresses: state unranking in Sanskrit prosody and zero-allocation integer systems](emw-001-one-lattice/paper.md) | Draft v0.3 | [`prastara`](emw-001-one-lattice/prastara) |
 
 ## Receipts
 
