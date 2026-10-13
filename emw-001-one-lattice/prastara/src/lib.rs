@@ -1,10 +1,13 @@
-//! prastara — reference implementation for WP-003 (draft).
+//! prastara — reference implementation for EMW-001 (draft).
 //! Three table-free, zero-allocation state addressings from Sanskrit prosody.
-//! Encoding: guru (G, long) = 1, laghu (L, short) = 0. Position 0 = first syllable = LSB.
+//! Encoding: laghu (L, short) = 1, guru (G, long) = 0. Position 0 = first syllable = LSB.
+//! Under this convention Piṅgala's row k is the little-endian binary of k - 1
+//! (Van Nooten 1993; Kulkarni 2008 §2.2.1). A set bit is a laghu.
 #![cfg_attr(not(test), no_std)]
 
-/// Naṣṭa: 1-indexed row k of the n-syllable prastāra -> guru bitmask.
-/// Literal rule: k odd -> L, k <- (k+1)/2 ; k even -> G, k <- k/2.
+/// Naṣṭa (Chandaḥśāstra 8.24–8.25): 1-indexed row k of the n-syllable prastāra -> laghu bitmask.
+/// Literal rule: k even ("l-ardhe", it halves) -> L, k <- k/2 ;
+///               k odd  ("sa-eke g", add one)  -> G, k <- (k+1)/2.
 pub fn nashta(mut k: u64, n: u32) -> u64 {
     let mut mask = 0u64;
     for i in 0..n {
@@ -18,8 +21,10 @@ pub fn nashta(mut k: u64, n: u32) -> u64 {
     mask
 }
 
-/// Uddiṣṭa: guru bitmask -> 1-indexed row.
-/// Literal rule: write 1,2,4,... over syllables; sum values over gurus; add 1.
+/// Uddiṣṭa: laghu bitmask -> 1-indexed row.
+/// Kedāra Bhaṭṭa's form (Vṛttaratnākara, c. 1100): write 1,2,4,... over the syllables;
+/// sum the values over the laghus; add 1. Piṅgala's own 8.26–8.27 (double from the
+/// first laghu, subtract one at each guru) is Horner's rule on the same digits.
 pub fn uddishta(mask: u64, n: u32) -> u64 {
     let mut k = 1u64;
     for i in 0..n {
@@ -73,7 +78,7 @@ pub fn suci_scan(buf: &mut [u64], k: u32) {
     }
 }
 
-/// Combinadic unrank: 0-indexed rank k (colex) -> bitmask with exactly r gurus among n.
+/// Combinadic unrank: 0-indexed rank k (colex) -> bitmask with exactly r laghus among n.
 pub fn combinadic_unrank(mut k: u64, n: u32, r: u32) -> u64 {
     let mut mask = 0u64;
     let mut c = n;
@@ -183,7 +188,7 @@ mod tests {
     }
 
     #[test]
-    fn row_with_r_gurus_counts_binomial() {
+    fn row_with_r_laghus_counts_binomial() {
         for n in 1..=N {
             let mut counts = [0u64; 64];
             for m in 0..(1u64 << n) {

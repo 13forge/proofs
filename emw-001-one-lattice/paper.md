@@ -2,7 +2,7 @@
 ### State unranking in Sanskrit prosody and zero-allocation integer systems
 
 **Sean (Deveraux)** · 2748684 Alberta Ltd · deveraux.dev
-**Series:** East Meets West, EMW-001 · **Status:** DRAFT v0.1 (2026-10-13)
+**Series:** East Meets West, EMW-001 · **Status:** DRAFT v0.2 (2026-10-12; v0.1 2026-10-13 UTC)
 **Licence:** text CC BY 4.0 · code MIT OR Apache-2.0
 
 ---
@@ -38,25 +38,26 @@ Sanskrit prosody needed to catalogue every possible metre. Over about fifteen ce
 
 | Date | Source | Contribution | Status |
 |---|---|---|---|
-| c. 3rd–2nd c. BCE | Piṅgala, *Chandaḥśāstra* | Terse sūtras for prastāra (enumeration), naṣṭa, uddiṣṭa, saṅkhyā | [VERIFY sūtra numbers] |
-| c. 600–800 CE | Virahāṅka, *Vṛttajātisamuccaya* | Mātrā count: each term = sum of the previous two | Singh 1985 |
-| c. 7th c. CE | Virahāṅka, *Vṛttajātisamuccaya* | **Sūci-prastāra** ("needle spread"): binomial columns by repeated partial sums, dropping the last term each pass. Shah identifies it with Piṅgala's *lagakriyā*. | Shah 2008 [VERIFY against the Velankar edition] |
+| c. 3rd–2nd c. BCE | Piṅgala, *Chandaḥśāstra* 8.20–8.35 | Terse sūtras: prastāra 8.20–23, naṣṭa 8.24–25, uddiṣṭa 8.26–27, saṅkhyā 8.28–31, adhvayoga 8.32–33, "pare pūrṇam" 8.34–35. The Yajur recension carries an extra lagakriyā sūtra ("ekottarakramaśaḥ pūrvapṛktā lasaṃkhyā") absent from Halāyudha's text. | Kedāranātha ed. 1938 (Kāvyamālā 91); Kulkarni 2008; Shah 2008 pp. 8, 29 |
+| c. 1st c. CE | Bharata, *Nāṭyaśāstra* | **Lagakriyā by repeated partial sums**, dropping the terminal sum each pass: the earliest firmly attested binomial construction in the Indian record. | Shah 2008 pp. 2, 9–10 |
+| c. 7th c. CE | Virahāṅka, *Vṛttajātisamuccaya* 6.7–6.9, 6.10–6.12 | Names and gives **both** constructions: **sūci-prastāra** ("needle spread", the partial-sum column method) and **meru-prastāra** (the two-cells-above triangle). Shah: "Sūci is Piṅgala's Lagakriyā"; meru first appears here, not in Halāyudha. Also the mātrā rule: each count = sum of the previous two. | Shah 2008 pp. 10, 19, 31–32 (translating Velankar 1962); Singh 1985 |
 | before 1135 | Gopāla (commentary on Virahāṅka) | Worked values 3, 5, 8, 13, 21 | Singh 1985 |
 | c. 1150 | Hemacandra | Same recurrence, stated independently | Singh 1985 |
-| 10th c. | Halāyudha, *Mṛtasañjīvanī* (commentary on Piṅgala) | Explicit procedures, including **meru-prastāra** (the triangle). Reading it back into Piṅgala's sūtra is **disputed**: Weber and Shah reject it, Alsdorf defends it. | Shah 2008 |
+| c. 950 | Halāyudha, *Mṛtasañjīvanī* (commentary on Piṅgala) | First to read the repeated sūtra 8.34–35 "pare pūrṇam iti" as an instruction to build the meru. That reading is **disputed**: Weber (1863) and Shah reject it, Alsdorf (1933) defends it. The triangle itself is three centuries older (Virahāṅka). | Shah 2008 pp. 2, 8, 29 |
 | 1202 | Fibonacci, *Liber Abaci* | Same recurrence, in Europe | — |
 | early 14th c. | *Prākṛta Paiṅgala* | **Mātrā-meru**: mātrā metres tabulated by guru count; entries are binomial | Singh 1985 |
 | 1356 | Nārāyaṇa Paṇḍita, *Gaṇita Kaumudī* | **Sūcī-paṅkti** ("needle sequence"): a separate construction, built from products, yielding multinomial generalisations. Not the same as Virahāṅka's sūci-prastāra. | Singh 1985 |
-| 1011–1077 | Shao Yong | Binary-ordered hexagram arrangement | [VERIFY] |
-| 1679 | Leibniz, *De progressione dyadica* | Binary arithmetic | — |
-| 1701 | Bouvet → Leibniz | Hexagram diagram, which Leibniz took as **confirmation**, not origin | — |
-| 1703 | Leibniz, *Explication de l'Arithmétique Binaire* | Publication | — |
+| 1011–1077 | Shao Yong | The *xiantian* ("Fuxi") hexagram arrangement, later read as a binary ordering. Whether Shao Yong's own usage was binary is contested (Maitre 2025). | Swarthmore Leibniz–Bouvet archive; Maitre 2025 |
+| 15 Mar 1679 | Leibniz, *De progressione dyadica* (MS, Hannover) | Binary arithmetic, dated in Leibniz's hand | Hochstetter & Greve 1966 facsimile |
+| 4 Nov 1701 | Bouvet → Leibniz (received 1 Apr 1703) | Hexagram woodcut, which Leibniz took as **confirmation**, not origin. Leibniz had sent Bouvet his binary table on 15 Feb 1701. | Swarthmore Leibniz–Bouvet archive |
+| 1703 (printed 1705) | Leibniz, *Explication de l'Arithmétique Binaire* | Sent to the Académie within a week of Bouvet's letter arriving; printed in the *Mémoires* for 1703 | Swarthmore Leibniz–Bouvet archive |
 | 1967 | Ingerman, *CACM* 10(3) | Proposes "Pāṇini–Backus Form" | — |
 
 **Corrections logged against circulating accounts:**
-- *"Leibniz got binary from the I Ching."* False. He had binary in 1679 and received the hexagrams in 1701.
-- *"Piṅgala wrote Pascal's triangle."* Disputed. The triangle is in Halāyudha's commentary, about a millennium later, and Shah argues the sūtra doesn't support it.
-- *Sūci-prastāra.* Shah (2008) attributes it to Virahāṅka, c. 7th c., and describes it as repeated partial sums. That makes it the **earliest firmly attested binomial construction in the Indian record**, earlier than the meru-prastāra. Nārāyaṇa's sūcī-paṅkti (1356) is a different object; don't conflate the two.
+- *"Leibniz got binary from the I Ching."* False. He had binary in 1679 and received the hexagrams in 1703 (letter dated 1701).
+- *"Piṅgala wrote Pascal's triangle."* Disputed. The triangle first appears by name in Virahāṅka (7th c.); Halāyudha (10th c.) is the first to attribute it to Piṅgala's sūtra, and Shah argues the sūtra doesn't support that. Shah does trace the *computation* of binomials to Piṅgala via the Yajur-recension lagakriyā sūtra.
+- *Sūci-prastāra.* The **name** is Virahāṅka's (7th c.). The **construction** (repeated partial sums, terminal sum dropped) is already in Bharata's *Nāṭyaśāstra* (c. 1st c. CE), so Bharata, not Virahāṅka, holds the earliest firm attestation. Our v0.1 draft said "earliest … earlier than the meru-prastāra"; both halves were wrong, since Virahāṅka gives sūci and meru side by side. Nārāyaṇa's sūcī-paṅkti (1356) is a different object; don't conflate the two.
+- *Naṣṭa orientation (our own v0.1 error).* Sūtra 8.24 *l-ardhe*: "if it halves, L"; 8.25 *sa-eke g*: "with one added, G". So an **even** row index yields L and an **odd** one yields G, row 1 being all-G. Our draft had the parities swapped. The "write 1, 2, 4 over the syllables and add" form of uddiṣṭa is Kedāra Bhaṭṭa's (*Vṛttaratnākara*, c. 1100), not Piṅgala's 8.26–27, which doubles from the first laghu and subtracts one at each guru. Corrected in §3–§4; the theorem and code were already consistent with the corrected reading once the bit is read as laghu.
 - *"Oldest prefix-sum accumulator in history."* Unsupported superlative. Removed.
 - *"Prosodists flattened the triangle to cut working-memory load."* A plausible motive, but no text says it. Removed.
 
@@ -64,7 +65,9 @@ Sanskrit prosody needed to catalogue every possible metre. Over about fifteen ce
 
 ## 3. Encoding
 
-A metre of *n* syllables is a word in {L, G}ⁿ. Laghu (L, short) → 0, guru (G, long) → 1. Syllable *i* (0-indexed from the start of the line) is bit *i*, so **the first syllable is the least significant bit**. In mātrā (duration) metres, L weighs 1 and G weighs 2.
+A metre of *n* syllables is a word in {L, G}ⁿ. Laghu (L, short) → 1, guru (G, long) → 0. Syllable *i* (0-indexed from the start of the line) is bit *i*, so **the first syllable is the least significant bit**. This is the convention under which Piṅgala's row *k* reads as the binary of *k* − 1 (Van Nooten 1993; Kulkarni 2008 §2.2.1). In mātrā (duration) metres, L weighs 1 and G weighs 2.
+
+The same construction works in any radix *B*: Kulkarni (2008, Table 11) states Piṅgala's uddiṣṭa for base *B* directly. A balanced-ternary lattice (digits −1, 0, +1 stored as 0, 1, 2) is the *B* = 3 case, and its pack/unpack is naṣṭa/uddiṣṭa with 3 in place of 2.
 
 ---
 
@@ -72,13 +75,13 @@ A metre of *n* syllables is a word in {L, G}ⁿ. Laghu (L, short) → 0, guru (G
 
 **Prastāra.** The canonical enumeration of {L, G}ⁿ starts at all-G. Each next row flips the first G to L and resets every earlier syllable to G. That is a binary counter running backwards. Indices are **1-based**.
 
-**Naṣṭa (index → metre).** Given row *k*: if *k* is odd, the syllable is L and *k* ← (*k*+1)/2. If *k* is even, the syllable is G and *k* ← *k*/2. Repeat *n* times.
+**Naṣṭa (index → metre), sūtras 8.24–8.25.** Given row *k*: if *k* is even (*l-ardhe*, "it halves"), the syllable is L and *k* ← *k*/2. If *k* is odd (*sa-eke g*, "with one added"), the syllable is G and *k* ← (*k*+1)/2. Repeat *n* times.
 
-**Uddiṣṭa (metre → index).** Write 1, 2, 4, … over the syllables. Add the values over the gurus, then add 1.
+**Uddiṣṭa (metre → index), sūtras 8.26–8.27.** Piṅgala: start at 1 on the last syllable and work backwards, doubling at each syllable and subtracting one after doubling at each guru. Kedāra Bhaṭṭa's later form (c. 1100) is the one usually quoted: write 1, 2, 4, … over the syllables, add the values over the **laghus**, then add 1. Both give the same number.
 
 > **Theorem 1 (PROVEN).** Under the encoding of §3, naṣṭa(*k*) = *k* − 1, and uddiṣṭa is its inverse. The prastāra is the bijection {1…2ⁿ} ↔ {0,1}ⁿ given by little-endian binary of *k* − 1.
 >
-> *Proof.* Write *k* − 1 = Σ bᵢ2ⁱ. The parity of *k* is the complement of b₀: *k* odd ⇔ b₀ = 0 ⇔ L. Both update rules map *k* to 1 + ⌊(*k*−1)/2⌋, which shifts *k* − 1 right by one bit. By induction on *n*, the *i*-th emitted syllable is bᵢ. Uddiṣṭa computes 1 + Σ bᵢ2ⁱ = *k* directly. ∎
+> *Proof.* Write *k* − 1 = Σ bᵢ2ⁱ. Then *k* even ⇔ b₀ = 1 ⇔ L. Both update rules map *k* to 1 + ⌊(*k*−1)/2⌋, which shifts *k* − 1 right by one bit. By induction on *n*, the *i*-th emitted syllable is bᵢ. Kedāra's uddiṣṭa computes 1 + Σ bᵢ2ⁱ = *k* directly; Piṅgala's backward doubling is Horner's rule on the same digits. ∎
 
 **Saṅkhyā (count).** |{L, G}ⁿ| = 2ⁿ, computed by Piṅgala's rule: for even *n*, halve and square; for odd *n*, subtract one and double. This is exponentiation by squaring, O(log *n*), the same method modular exponentiation in RSA uses.
 
@@ -88,9 +91,9 @@ A metre of *n* syllables is a word in {L, G}ⁿ. Laghu (L, short) → 0, guru (G
 
 ## 5. Addressing II: weight-constrained (meru-prastāra)
 
-The number of *n*-syllable metres with exactly *r* gurus is C(*n*, *r*). The meru-prastāra tabulates these values.
+The number of *n*-syllable metres with exactly *r* laghus is C(*n*, *r*). Lagakriyā ("the L-reckoning") computes these values; the sūci and meru prastāras tabulate them.
 
-> **Theorem 2 (PROVEN).** The weight-*r* rows of the prastāra are addressable by the **combinatorial number system**: every 0 ≤ *k* < C(*n*,*r*) has a unique representation *k* = Σⱼ₌₁ʳ C(cⱼ, j) with *n* > c_r > … > c₁ ≥ 0, and the guru positions are {cⱼ}. Unranking is greedy: for *j* = *r* down to 1, take the largest *c* with C(*c*, *j*) ≤ *k*, set guru *c*, and subtract.
+> **Theorem 2 (PROVEN).** The weight-*r* rows of the prastāra are addressable by the **combinatorial number system**: every 0 ≤ *k* < C(*n*,*r*) has a unique representation *k* = Σⱼ₌₁ʳ C(cⱼ, j) with *n* > c_r > … > c₁ ≥ 0, and the laghu positions are {cⱼ}. Unranking is greedy: for *j* = *r* down to 1, take the largest *c* with C(*c*, *j*) ≤ *k*, set laghu *c*, and subtract.
 >
 > *Proof.* Standard (Lehmer; Knuth TAOCP 7.2.1.3). Exhaustively checked for *n* ≤ 20 in Appendix A. ∎
 
@@ -98,7 +101,7 @@ The number of *n*-syllable metres with exactly *r* gurus is C(*n*, *r*). The mer
 
 ### 5.1 Sūci-prastāra: the binomials as an iterated scan
 
-Virahāṅka builds the binomial columns by partial sums. Column 1 is 1, 2, …, *n*. Each later column is the running sum of the one before, with the last entry dropped (Shah 2008).
+Bharata, and after him Virahāṅka under the name sūci-prastāra, build the binomial columns by partial sums. Column 1 is 1, 2, …, *n*. Each later column is the running sum of the one before, with the last entry dropped (Shah 2008 pp. 9–10, 31–32; Virahāṅka 6.7–6.9: "one-by-one, add the number above … successively leave out the last number").
 
 > **Theorem 5 (PROVEN). Hockey-stick = one sūci pass.** Σᵢ₌ᵣⁿ C(*i*, *r*) = C(*n*+1, *r*+1). Equivalently, applying an inclusive scan *k* times to the all-ones vector gives C(*i*+*k*, *k*) at index *i*.
 >
@@ -144,8 +147,8 @@ Let M(*n*) be the number of L/G sequences of total duration *n*, with L = 1 and 
 
 | Constraint | Count | Unrank method | Prosodic source |
 |---|---|---|---|
-| fixed length *n* | 2ⁿ | binary digits of *k*−1 | Piṅgala: naṣṭa / uddiṣṭa |
-| fixed length *n*, *r* gurus | C(*n*,*r*) | greedy on binomials | sūci-prastāra (Virahāṅka); meru-prastāra (Halāyudha) |
+| fixed length *n* | 2ⁿ | binary digits of *k*−1 | Piṅgala 8.24–8.27: naṣṭa / uddiṣṭa |
+| fixed length *n*, *r* laghus | C(*n*,*r*) | greedy on binomials | lagakriyā (Bharata); sūci- and meru-prastāra (Virahāṅka) |
 | fixed duration *n* | F(*n*+1) | greedy on Fibonacci | Virahāṅka; mātrā-meru (*Prākṛta Paiṅgala*) |
 
 Each row is a numeration system whose place values are the counts of the constrained space (powers of two, binomials, Fibonacci numbers). Unranking means writing *k* in that system. This is the single lattice the title refers to.
@@ -156,8 +159,9 @@ Each row is a numeration system whose place values are the counts of the constra
 
 | Use | Addressing | Why it fits | Status |
 |---|---|---|---|
-| Deterministic state #*k* with no lookup table | I | Index → state in O(*n*) integer ops; nothing allocated, nothing to cache-miss | DESIGN_TARGET |
+| Deterministic state #*k* with no lookup table | I | Index → state in O(*n*) integer ops; nothing allocated. **Bounded:** at one byte of state a 64 KB pair table measured about 6× faster than register decode on a desktop x86 core, warm and after a 64 MB cache evict alike. Table-free wins only where a table cannot live: wide states (3¹³ and up), register-only GPU kernels, no_std targets without a data cache. | DESIGN_TARGET (bench exists, local) |
 | Exactly *r* active of *n* (voices, channels, capability bits) | II | Dense index over valid states only; invalid states can't be addressed at all | DESIGN_TARGET |
+| Exactly *r* non-zero of *n* **signed** digits (balanced ternary) | II × I | Class size C(*n*,*r*)·2ʳ. Address = combinadic rank of the support, shifted left *r*, OR the *r* sign bits compressed onto the support. This is enumerative coding (Cover 1973) under the lexicographic order (support, then sign); the refinement by sign count C(*n*,*r*)·C(*r*,*p*) is the multinomial Nārāyaṇa's sūcī-paṅkti counts. | DESIGN_TARGET |
 | Rhythm space under a fixed bar length | III | Enumerates every subdivision of *n* ticks into 1- and 2-tick units, densely and in order | DESIGN_TARGET |
 | Division-free binomial tables | II (sūci) | Iterated scans; add-only integer path; maps onto SIMD scan | DESIGN_TARGET |
 | Ingress validation | I–III | The ranking function doubles as a validator: a state is well-formed iff ranking it round-trips | DESIGN_TARGET |
@@ -174,16 +178,26 @@ Piṅgala, Shao Yong, Leibniz and Shannon arrived at binary enumeration independ
 
 ## References
 
-- Shah, J. (2008/2013). A history of Piṅgala's combinatorics. *Gaṇita Bhāratī* 35. — preprint: sanskrit.uohyd.ac.in/Algorithms_in_Ancient_India/Material/Pingala.pdf [VERIFY final citation]
+Page numbers for Shah refer to the 2008 preprint (44 pp.), which is the text we read.
+
+- Piṅgala. *Chandaḥśāstram*, with Halāyudha's *Mṛtasañjīvanī* and Madhusūdana's *Chandonirukti*. Ed. Kedāranātha (Jaipur). Kāvyamālā 91, Bombay, 1938. Transliteration of the sūtras: ancient-buddhist-texts.net/Textual-Studies/Chandas-Sastra. [VERIFY: publisher imprint of Kāvyamālā 91 not seen; commonly given as Nirnaya Sagar Press]
+- Virahāṅka. *Vṛttajātisamuccaya*, with Gopāla's commentary. Ed. H. D. Velankar. Rajasthan Oriental Research Institute, Jodhpur, 1962 (Rajasthan Puratana Granthamala 61). [VERIFY: edition not consulted directly; verses 6.7–6.12 read in Shah's translation]
+- Shah, J. (2008). A history of Piṅgala's combinatorics. Preprint, 44 pp.: sanskrit.uohyd.ac.in/Algorithms_in_Ancient_India/Material/Pingala.pdf. Published as *Gaṇita Bhāratī* 35(1–2), 2013, 1–54 [pages from a secondary listing, not seen].
+- Kulkarni, A. (2008). Recursion and combinatorial mathematics in Chandaśśāstra. arXiv:math/0703658v2 [math.HO]. (Sūtra numbering 8.20–8.35; base-*B* uddiṣṭa, Table 11.)
+- Weber, A. (1863). *Über die Metrik der Inder.* Berlin (Indische Studien 8). [VERIFY: Shah's text says 1835 in prose and 1863 in the reference list]
+- Alsdorf, L. (1933). Die Pratyayas. Ein Beitrag zur indischen Mathematik. *Zeitschrift für Indologie und Iranistik* 9, 97–157. English tr. S. R. Sarma, *Indian Journal of History of Science* 26(1), 1991.
+- Van Nooten, B. (1993). Binary numbers in Indian antiquity. *Journal of Indian Philosophy* 21(1), 31–50.
+- Singh, P. (1985). The so-called Fibonacci numbers in ancient and medieval India. *Historia Mathematica* 12(3), 229–244. doi:10.1016/0315-0860(85)90021-7.
+- Sridharan, Raja, Sridharan, R. & Srinivas, M. D. (2012). Nārāyaṇa Paṇḍita's enumeration of combinations and associated representation of numbers as sums of binomial coefficients. *Indian Journal of History of Science* 47, 607–631.
+- Kusuba, T. (1993). *Combinatorics and Magic Squares in India: A Study of Nārāyaṇa Paṇḍita's Gaṇitakaumudī, Chapters 13–14.* PhD thesis, Brown University.
 - Datta, B. & Singh, A. N. (1935–38). *History of Hindu Mathematics.*
+- Maitre, M.-J. (2025). Is the *Fuxi liushisi gua fangwei* diagram attributed to Shao Yong binary? *Science in Context.*
+- Leibniz, G. W. (1679). *De progressione dyadica.* MS dated 15 March 1679, Niedersächsische Landesbibliothek, Hannover. Facsimile: Hochstetter & Greve (1966).
+- Leibniz, G. W. (1703, printed 1705). Explication de l'Arithmétique Binaire. *Mémoires de l'Académie Royale des Sciences.* Leibniz–Bouvet correspondence: archive.swarthmore.edu/leibniz-bouvet (letter of 4 Nov 1701, received 1 Apr 1703).
+- Ingerman, P. Z. (1967). "Pāṇini–Backus Form" suggested. *Communications of the ACM* 10(3), 137. doi:10.1145/363162.363165.
+- Cover, T. M. (1973). Enumerative source encoding. *IEEE Transactions on Information Theory* 19(1), 73–77.
 - Blelloch, G. E. (1990). Prefix sums and their applications. CMU-CS-90-190.
-- Singh, P. (1985). The so-called Fibonacci numbers in ancient and medieval India. *Historia Mathematica* 12, 229–244.
-- Ingerman, P. Z. (1967). "Pāṇini–Backus Form" suggested. *Communications of the ACM* 10(3), 137.
-- Leibniz, G. W. (1703). Explication de l'Arithmétique Binaire. *Mémoires de l'Académie Royale des Sciences.*
 - Knuth, D. E. *The Art of Computer Programming*, Vol. 4A, §7.2.1.3 (combinations) and §7.2.1.7 (history of generation).
-- [VERIFY] Primary edition and translation of Piṅgala's *Chandaḥśāstra* with Halāyudha's *Mṛtasañjīvanī*.
-- [VERIFY] Van Nooten, B. (1993). Binary numbers in Indian antiquity. *Journal of Indian Philosophy* 21, 31–50.
-- [VERIFY] Sridharan, R. et al. on Nārāyaṇa's enumeration of combinations.
 
 ---
 
@@ -196,14 +210,16 @@ cargo test --release
 test tests::nashta_is_binary_of_k_minus_1 ............ ok   (n ≤ 20, all k)
 test tests::uddishta_inverts_nashta .................. ok   (n ≤ 20, all k)
 test tests::sankhya_is_pow2 .......................... ok   (n ≤ 63)
-test tests::row_with_r_gurus_counts_binomial ......... ok   (n ≤ 20)
+test tests::row_with_r_laghus_counts_binomial ........ ok   (n ≤ 20)
 test tests::combinadic_is_bijection_onto_weight_r .... ok   (n ≤ 20, all r, all k)
 test tests::hockey_stick_column_prefix_sum ........... ok   (r ≤ 20, n ≤ 60)
 test tests::suci_iterated_scan_is_binomial ........... ok   (k ≤ 20, i < 48)
 test tests::shallow_diagonal_is_matra_count .......... ok   (n ≤ 80)
 test tests::matra_unrank_matches_brute_force_lex ..... ok   (n ≤ 20, vs brute force)
 test tests::matra_by_guru_count_is_binomial .......... ok   (n ≤ 20)
-test result: ok. 10 passed; 0 failed — 0.70s (rustc 1.97.0, release)
+test result: ok. 10 passed; 0 failed; 0 ignored — finished in 0.42s
 ```
 
-Reference run: 2026-10-13, Linux x86_64. Re-run locally to reproduce.
+Reference run: 2026-10-12, Windows 11 x86_64 (AMD Ryzen 7 5800X3D), rustc 1.100.0-beta.4, `cargo test --release`, exit 0. Re-run locally to reproduce.
+
+In the code, bit *i* = 1 means syllable *i* is **laghu**, per §3. The `nashta` rule `k even → set bit` is sūtra 8.24 read literally.
