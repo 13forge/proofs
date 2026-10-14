@@ -1,0 +1,25 @@
+cff-version: 1.2.0
+message: "If you use this work, please cite it as below."
+title: "One Lattice, Three Addresses: State Unranking in Sanskrit Prosody and Zero-Allocation Integer Systems"
+version: "0.4"
+date-released: 2026-10-13
+doi: 10.5281/zenodo.23334659
+license: CC-BY-4.0
+repository-code: "https://github.com/13forge/proofs"
+url: "https://deveraux.dev"
+authors:
+  - family-names: Morin
+    given-names: Sean
+    alias: Deveraux
+    affiliation: "2748684 Alberta Ltd."
+keywords:
+  - Sanskrit prosody
+  - Pingala
+  - Virahanka
+  - suci-prastara
+  - ranking and unranking
+  - enumerative coding
+  - combinatorial number system
+  - prefix sum
+  - balanced ternary
+  - deterministic computing
